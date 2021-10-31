@@ -24,6 +24,7 @@ async function run() {
     // create a document to insert
     app.post("/addride", async (req, res) => {
       const ride = req.body;
+      console.log(ride)
       const result = await ridesCollection.insertOne(ride);
       console.log(`A document was inserted with the _id: ${result.insertedId}`);
       res.json(result);
