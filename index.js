@@ -18,81 +18,64 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     await client.connect();
-    const database = client.db("AmazingPark");
-    const ridesCollection = database.collection("Rides");
-    const userridesCollection = database.collection("userRides");
+    const database = client.db("Paxos");
+    const destinationCollection = database.collection("Destination");
+    const bookingCollection = database.collection("BookedPlaces");
     // create a document to insert
-    app.post("/addride", async (req, res) => {
-      const ride = req.body;
-      console.log(ride)
-      const result = await ridesCollection.insertOne(ride);
-      console.log(`A document was inserted with the _id: ${result.insertedId}`);
-      res.json(result);
-    });
-
-
-
-    app.delete("/mainride/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
-      const result = await ridesCollection.deleteOne(query);
-      console.log(result);
+    app.post("/adddestination", async (req, res) => {
+      const destination = req.body;
+      const result = await destinationCollection.insertOne(destination);
       res.json(result);
     });
 
     // get document from database
-    app.get("/allride", async (req, res) => {
-      const cursor = ridesCollection.find({});
-      const rides = await cursor.toArray();
-      // print a message if no documents were found
-      if ((await cursor.count()) === 0) {
-        console.log("No documents found!");
-      }
-      res.send(rides);
+    app.get("/alldestination", async (req, res) => {
+      const cursor = destinationCollection.find({});
+      const destination = await cursor.toArray();
+      res.json(destination);
     });
 
-    app.get("/ride/:id", async (req, res) => {
+    app.delete("/destination/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
-      const Ride = await ridesCollection.findOne(query);
-      res.json(Ride);
-    });
-
-    // specifiq user order
-
-    app.post("/buyride", async (req, res) => {
-      const ride = req.body;
-      const result = await userridesCollection.insertOne(ride);
-      console.log(`A document was inserted with the _id: ${result.insertedId}`);
+      const result = await destinationCollection.deleteOne(query);
       res.json(result);
     });
 
-    // specifiq user order Tiket
-    app.get("/userorder/:email", async (req, res) => {
+    app.get("/destination/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const Destination = await destinationCollection.findOne(query);
+      res.json(Destination);
+    });
+
+    // booking order user order
+    app.post("/bookingplace", async (req, res) => {
+      const ride = req.body;
+      const result = await bookingCollection.insertOne(ride);
+      res.json(result);
+    });
+
+    // specifiq user Place
+    app.get("/bookingplace/:email", async (req, res) => {
       const email = req.params.email;
-      const result = userridesCollection.find({ userEmail: email });
+      const result = bookingCollection.find({ email: email });
       const order = await result.toArray();
-      console.log(email);
       res.json(order);
     });
 
     // get document from database
-    app.get("/allorder", async (req, res) => {
-      const cursor = userridesCollection.find({});
+    app.get("/allorders", async (req, res) => {
+      const cursor = bookingCollection.find({});
       const order = await cursor.toArray();
-      // print a message if no documents were found
-      if ((await cursor.count()) === 0) {
-        console.log("No documents found!");
-      }
       res.json(order);
     });
 
     // delete order item
-    app.delete("/ride/:id", async (req, res) => {
+    app.delete("/order/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
-      const result = await userridesCollection.deleteOne(query);
-      console.log(result);
+      const result = await bookingCollection.deleteOne(query);
       res.json(result);
     });
   } finally {
