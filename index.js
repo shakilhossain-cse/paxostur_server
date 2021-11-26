@@ -17,6 +17,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+    // connect database 
     await client.connect();
     const database = client.db("Paxos");
     const destinationCollection = database.collection("Destination");
